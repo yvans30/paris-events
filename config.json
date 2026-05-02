@@ -1,0 +1,37 @@
+{
+  "city": "Paris",
+  "email": "yvankiegain@gmail.com",
+  "domains": [
+    "intelligence artificielle",
+    "machine learning",
+    "data science",
+    "developpement logiciel",
+    "cloud computing",
+    "devops",
+    "cybersecurite",
+    "blockchain",
+    "finance",
+    "fintech",
+    "trading",
+    "crypto"
+  ],
+  "event_types": [
+    "meetup",
+    "conference",
+    "hackathon",
+    "workshop",
+    "networking",
+    "afterwork",
+    "talk"
+  ],
+  "sources": [
+    "eventbrite.fr",
+    "meetup.com",
+    "lu.ma",
+    "welovedevs.com",
+    "paris.comet.co"
+  ],
+  "lookahead_days": 14,
+  "language": "fr",
+  "schedule": "weekly_monday"
+}
