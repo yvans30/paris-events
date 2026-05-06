@@ -86,7 +86,7 @@ Je réessaierai la semaine prochaine.</p>"""
     return html
 
 
-def send_email(to_addr, subject, html_body):
+def send_email(recipients, subject, html_body):
     gmail_user = os.environ.get("GMAIL_USER")
     gmail_password = os.environ.get("GMAIL_APP_PASSWORD")
 
@@ -94,17 +94,21 @@ def send_email(to_addr, subject, html_body):
         print("[ERROR] GMAIL_USER ou GMAIL_APP_PASSWORD non défini.", file=sys.stderr)
         sys.exit(1)
 
+    if not recipients:
+        print("[ERROR] GMAIL_RECIPIENTS non défini ou vide.", file=sys.stderr)
+        sys.exit(1)
+
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = gmail_user
-    msg["To"] = to_addr
+    msg["To"] = ", ".join(recipients)
     msg.attach(MIMEText(html_body, "html", "utf-8"))
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(gmail_user, gmail_password)
-        server.sendmail(gmail_user, to_addr, msg.as_string())
+        server.sendmail(gmail_user, recipients, msg.as_string())
 
-    print(f"[OK] Email envoyé à {to_addr}", file=sys.stderr)
+    print(f"[OK] Email envoyé à : {', '.join(recipients)}", file=sys.stderr)
 
 
 def main():
@@ -121,8 +125,9 @@ def main():
     subject = f"Evenements Tech & Finance Paris - Semaine du {date_from_fmt}"
     html_body = generate_html(events, date_from, date_to)
 
-    to_addr = config.get("email", "yvankiegain@gmail.com")
-    send_email(to_addr, subject, html_body)
+    raw_recipients = os.environ.get("GMAIL_RECIPIENTS", "")
+    recipients = [r.strip() for r in raw_recipients.split(",") if r.strip()]
+    send_email(recipients, subject, html_body)
 
 
 if __name__ == "__main__":
