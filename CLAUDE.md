@@ -20,7 +20,7 @@ python fetch_events.py --from DATE_FROM --to DATE_TO | python send_report.py
 Ce pipeline :
 - Interroge les APIs Eventbrite et Meetup pour trouver les evenements tech/finance a Paris
 - Filtre selon les domaines et le prix (< 50 EUR) definis dans `config.json`
-- Envoie directement un email HTML a `yvankiegain@gmail.com`
+- Envoie directement un email HTML aux destinataires definis dans `GMAIL_RECIPIENTS`
 - Aucun fichier rapport n'est sauvegarde dans le repo
 
 ### 3. Variables d'environnement requises
@@ -33,6 +33,7 @@ Les credentials sont lus depuis l'environnement (configures dans `.claude/settin
 | `MEETUP_API_KEY` | Token API Meetup |
 | `GMAIL_USER` | Adresse Gmail expeditrice |
 | `GMAIL_APP_PASSWORD` | App Password Gmail (16 caracteres) |
+| `GMAIL_RECIPIENTS` | Liste des destinataires separes par des virgules |
 
 ### 4. Si le pipeline echoue
 
