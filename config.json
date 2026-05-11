@@ -4,16 +4,34 @@
   "domains": [
     "intelligence artificielle",
     "machine learning",
+    "deep learning",
     "data science",
+    "data",
+    "AI",
     "developpement logiciel",
+    "software",
+    "developer",
     "cloud computing",
     "devops",
     "cybersecurite",
     "blockchain",
+    "web3",
+    "tech",
+    "hackathon",
+    "startup",
     "finance",
     "fintech",
     "trading",
-    "crypto"
+    "crypto",
+    "investment",
+    "investing",
+    "private equity",
+    "venture capital",
+    "asset management",
+    "wealth management",
+    "marche financier",
+    "bourse",
+    "patrimoine"
   ],
   "event_types": [
     "meetup",
@@ -27,9 +45,7 @@
   "sources": [
     "eventbrite.fr",
     "meetup.com",
-    "lu.ma",
-    "welovedevs.com",
-    "paris.comet.co"
+    "lu.ma"
   ],
   "lookahead_days": 14,
   "language": "fr",

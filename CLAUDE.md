@@ -1,6 +1,6 @@
 # Paris Events Weekly - Veille Tech & Finance
 
-Ce projet est execute automatiquement chaque lundi par un trigger Claude Code.
+Ce projet est execute automatiquement chaque lundi par un trigger Claude Code remote.
 L'objectif est de trouver les evenements tech et finance a Paris pour les 2 prochaines semaines.
 
 ## Instructions d'execution
@@ -13,19 +13,29 @@ L'objectif est de trouver les evenements tech et finance a Paris pour les 2 proc
 ### 2. Lancer le pipeline Python
 
 ```bash
-cd /home/user/paris-events
-python fetch_events.py --from DATE_FROM --to DATE_TO | python send_report.py
+cd /Users/yvank/Documents/paris-events
+python fetch_events.py --from DATE_FROM --to DATE_TO
 ```
 
-Ce pipeline :
-- Interroge les APIs Eventbrite et Meetup pour trouver les evenements tech/finance a Paris
-- Filtre selon les domaines et le prix (< 50 EUR) definis dans `config.json`
-- Envoie directement un email HTML aux destinataires definis dans `GMAIL_RECIPIENTS`
-- Aucun fichier rapport n'est sauvegarde dans le repo
+Le pipeline interroge Eventbrite (API + scraping fallback), Meetup (API) et Luma (scraping).
+Il filtre par domaines tech/finance et prix (< 50 EUR), deduplique, et retourne un JSON sur stdout.
 
-### 3. Variables d'environnement requises
+### 3. Evaluer le resultat et envoyer l'email
 
-Les credentials sont lus depuis l'environnement (configures dans `.claude/settings.local.json`) :
+Lire le JSON de sortie du pipeline :
+
+- **Si >= 3 evenements** : piper directement dans `send_report.py` :
+  ```bash
+  python fetch_events.py --from DATE_FROM --to DATE_TO | python send_report.py
+  ```
+
+- **Si < 3 evenements** : completer avec WebSearch + WebFetch (voir section 5), merger les resultats avec ceux du pipeline, puis passer le JSON complet a `send_report.py` via stdin.
+
+L'email est envoye par SMTP via `send_report.py`. NE PAS utiliser Gmail MCP (il ne cree que des brouillons).
+
+### 4. Variables d'environnement requises
+
+Les credentials sont lus depuis l'environnement :
 
 | Variable | Description |
 |----------|-------------|
@@ -35,17 +45,23 @@ Les credentials sont lus depuis l'environnement (configures dans `.claude/settin
 | `GMAIL_APP_PASSWORD` | App Password Gmail (16 caracteres) |
 | `GMAIL_RECIPIENTS` | Liste des destinataires separes par des virgules |
 
-### 4. Si le pipeline echoue
+### 5. Fallback WebSearch (si < 3 events du pipeline)
 
-Si les APIs sont inaccessibles ou ne retournent aucun resultat, completer avec WebSearch :
+Si le pipeline retourne moins de 3 evenements, completer avec ces recherches :
 - `"evenements tech Paris cette semaine"` + date du jour
 - `"meetup IA machine learning Paris"` + mois en cours
+- `"conference data science Paris"` + mois en cours
 - `"hackathon Paris"` + mois en cours
 - `"evenement fintech finance Paris"` + mois en cours
+- `"conference finance investissement Paris"` + mois en cours
+- `"afterwork networking tech finance Paris"` + mois en cours
 
-Puis passer les resultats manuellement a `send_report.py` via stdin (JSON array).
+Pour les resultats prometteurs, utiliser WebFetch pour extraire les details (date, lieu, prix, lien).
+Filtrer : uniquement Paris, 2 prochaines semaines, tech ou finance, gratuit ou < 50 EUR.
+Formater en JSON array avec les champs : title, date, time, venue, address, type, price, url, description, source.
+Merger avec les events du pipeline, puis passer le tout a `send_report.py` via stdin.
 
-### 5. Notification si aucun evenement
+### 6. Notification si aucun evenement
 
 Si le JSON retourne un tableau vide `[]`, `send_report.py` envoie quand meme un email avec :
-"Aucun evenement tech/finance pertinent trouve a Paris pour les 2 prochaines semaines. Je reessaierai la semaine prochaine."
+"Aucun evenement tech/finance pertinent trouve a Paris pour les 2 prochaines semaines."
